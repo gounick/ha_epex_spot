@@ -94,7 +94,7 @@ class EpexSpotConfigFlow(ConfigFlow, domain=DOMAIN):  # type: ignore
             vol.Schema(
                 {
                     vol.Required(CONF_MARKET_AREA): vol.In(areas),
-                    vol.Required(CONF_DURATION): vol.In(durations),
+                    vol.Required(CONF_DURATION): vol.All(vol.Coerce(int), vol.In(durations)),
                     vol.Required(CONF_TOKEN): vol.Coerce(str),
                 }
             )
@@ -102,17 +102,15 @@ class EpexSpotConfigFlow(ConfigFlow, domain=DOMAIN):  # type: ignore
             else vol.Schema(
                 {
                     vol.Required(CONF_MARKET_AREA): vol.In(areas),
-                    vol.Required(CONF_DURATION): vol.In(durations),
+                    vol.Required(CONF_DURATION): vol.All(vol.Coerce(int), vol.In(durations)),
                 },
             )
         )
 
         # Add warning for HoferGruenstrom about disabled SSL
-        description_placeholders = {}
+        description_placeholders = {"ssl_warning": ""}
         if self._source_name == CONF_SOURCE_HOFER_GRUENSTROM:
-            description_placeholders = {
-                "ssl_warning": "Warning: SSL certificate verification is disabled for this source."
-            }
+            description_placeholders["ssl_warning"] = "Warning: SSL certificate verification is disabled for this source."
 
         return self.async_show_form(
             step_id="market_area",

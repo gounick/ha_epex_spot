@@ -1,3 +1,4 @@
+---
 get_lowest_price_interval:
   fields:
     device_id:

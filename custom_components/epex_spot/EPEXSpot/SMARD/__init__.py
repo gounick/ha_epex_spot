@@ -1,13 +1,12 @@
 """SMARD.de API."""
 
-from datetime import datetime, timezone
 import logging
-from typing import List
+from datetime import UTC, datetime
 
 import aiohttp
 
-from ...const import UOM_EUR_PER_KWH
 from ...common import Marketprice
+from ...const import UOM_EUR_PER_KWH
 
 # from homeassistant.util import dt
 
@@ -15,20 +14,7 @@ _LOGGER = logging.getLogger(__name__)
 
 MARKET_AREA_MAP = {
     "DE-LU": 4169,
-    "Anrainer DE-LU": 5078,
-    "BE": 4996,
-    "NO2": 4997,
     "AT": 4170,
-    "DK1": 252,
-    "DK2": 253,
-    "FR": 254,
-    "IT (North)": 255,
-    "NL": 256,
-    "PL": 257,
-    "CH": 259,
-    "SI": 260,
-    "CZ": 261,
-    "HU": 262,
 }
 
 
@@ -62,7 +48,7 @@ class SMARD:
         return "EUR"
 
     @property
-    def marketdata(self) -> List[Marketprice]:
+    def marketdata(self) -> list[Marketprice]:
         return self._marketdata
 
     async def fetch(self):
@@ -79,7 +65,7 @@ class SMARD:
         # and then some data is missing
         latest_timestamp = j["timestamps"][-2:]
 
-        entries: List[Marketprice] = []
+        entries: list[Marketprice] = []
 
         for lt in latest_timestamp:
             # get available data
@@ -91,16 +77,14 @@ class SMARD:
                 if entry[1] is not None:
                     entries.append(
                         Marketprice(
-                            start_time=datetime.fromtimestamp(
-                                entry[0] / 1000, tz=timezone.utc
-                            ),
+                            start_time=datetime.fromtimestamp(entry[0] / 1000, tz=UTC),
                             duration=self._duration,
                             price=round(float(entry[1]) / 1000.0, 6),
                             unit=UOM_EUR_PER_KWH,
                         )
                     )
 
-        if entries[-1].start_time.date() == datetime.today().date():
+        if entries[-1].start_time.date() == datetime.now(UTC).date():
             # latest data is on the same day, only return 48 entries
             # that's yesterday and today
             self._marketdata = entries[
@@ -115,7 +99,7 @@ class SMARD:
 
     async def _fetch_data(self, timestamp, market, region, resolution):
         # get available data
-        url = f"{self.URL}/{market}/{region}/{market}_{region}_{resolution}_{timestamp}.json"  # noqa: E501
+        url = f"{self.URL}/{market}/{region}/{market}_{region}_{resolution}_{timestamp}.json"
         async with self._session.get(url) as resp:
             resp.raise_for_status()
             return await resp.json()

@@ -147,7 +147,7 @@ def get_start_times(
             if latest_market_datetime <= earliest_start:
                 # no data available, return immediately to avoid exception
                 _LOGGER.debug(
-                    f"no data available yet: earliest_start={earliest_start}, latest_end={latest_end}"  # noqa: E501
+                    f"no data available yet: earliest_start={earliest_start}, latest_end={latest_end}"
                 )
                 return []
 
@@ -155,11 +155,11 @@ def get_start_times(
 
     if latest_end <= earliest_start:
         raise ValueError(
-            f"latest_end {latest_end} is earlier or equal to earliest_start {earliest_start}"  # noqa: E501
+            f"latest_end {latest_end} is earlier or equal to earliest_start {earliest_start}"
         )
 
     _LOGGER.debug(
-        f"extreme price service call: earliest_start={earliest_start}, latest_end={latest_end}"  # noqa: E501
+        f"extreme price service call: earliest_start={earliest_start}, latest_end={latest_end}"
     )
 
     return _calc_start_times(

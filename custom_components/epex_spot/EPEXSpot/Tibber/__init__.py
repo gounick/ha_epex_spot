@@ -1,11 +1,14 @@
 """Tibber API."""
 
+import logging
 from datetime import datetime
 
 import aiohttp
 
-from ...const import UOM_EUR_PER_KWH, TIBBER_DEMO_TOKEN
 from ...common import Marketprice
+from ...const import TIBBER_DEMO_TOKEN, UOM_EUR_PER_KWH
+
+_LOGGER = logging.getLogger(__name__)
 
 TIBBER_QUERY = """
 {
@@ -76,9 +79,19 @@ class Tibber:
 
     async def fetch(self):
         data = await self._fetch_data(self.URL)
-        self._marketdata = self._extract_marketdata(
-            data["data"]["viewer"]["homes"][0]["currentSubscription"]["priceInfo"]
-        )
+        try:
+            price_info = data["data"]["viewer"]["homes"][0]["currentSubscription"][
+                "priceInfo"
+            ]
+        except (KeyError, TypeError, IndexError) as err:
+            raise ValueError(
+                f"Unexpected Tibber API response: missing priceInfo ({err})"
+            ) from err
+
+        if price_info is None:
+            raise ValueError("Tibber API returned no priceInfo")
+
+        self._marketdata = self._extract_marketdata(price_info)
 
     async def _fetch_data(self, url):
         async with self._session.post(
@@ -96,22 +109,15 @@ class Tibber:
 
     def _extract_marketdata(self, data):
         entries = []
-        for entry in data["today"]:
-            entries.append(
-                Marketprice(
-                    duration=self._duration,
-                    start_time=datetime.fromisoformat(entry["startsAt"]),
-                    price=round(float(entry["total"]), 6),
-                    unit=UOM_EUR_PER_KWH,
+        for key in ("today", "tomorrow"):
+            day_data = data.get(key) or []
+            for entry in day_data:
+                entries.append(
+                    Marketprice(
+                        duration=self._duration,
+                        start_time=datetime.fromisoformat(entry["startsAt"]),
+                        price=round(float(entry["total"]), 6),
+                        unit=UOM_EUR_PER_KWH,
+                    )
                 )
-            )
-        for entry in data["tomorrow"]:
-            entries.append(
-                Marketprice(
-                    duration=self._duration,
-                    start_time=datetime.fromisoformat(entry["startsAt"]),
-                    price=round(float(entry["total"]), 6),
-                    unit=UOM_EUR_PER_KWH,
-                )
-            )
         return entries

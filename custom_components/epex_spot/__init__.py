@@ -3,10 +3,11 @@
 import asyncio
 import logging
 import random
-from typing import Any, Callable
+from collections.abc import Callable
+from typing import Any
 
+import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
-
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import ATTR_DEVICE_ID, Platform
 from homeassistant.core import (
@@ -17,10 +18,11 @@ from homeassistant.core import (
 )
 from homeassistant.exceptions import ConfigEntryNotReady, HomeAssistantError
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
-import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.device_registry import (
     DeviceEntryType,
     DeviceInfo,
+)
+from homeassistant.helpers.device_registry import (
     async_get as dr_async_get,
 )
 from homeassistant.helpers.entity import Entity, EntityDescription
@@ -37,6 +39,9 @@ from .const import (
     CONF_EARLIEST_START_TIME,
     CONF_LATEST_END_POST,
     CONF_LATEST_END_TIME,
+    CONF_SOURCE,
+    CONF_SOURCE_ENERGYCHARTS,
+    CONF_SOURCE_EPEX_SPOT_WEB,
     CONF_SURCHARGE_ABS,
     CONFIG_VERSION,
     DOMAIN,
@@ -73,7 +78,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     try:
         await source.fetch()
         source.update_time()
-    except Exception as err:  # pylint: disable=broad-except
+    except Exception as err:  # noqa: BLE001  # pylint: disable=broad-except
         ex = ConfigEntryNotReady()
         ex.__cause__ = err
         raise ex
@@ -191,16 +196,22 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
 async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> bool:
     """Migrate old entry data to the new entry schema."""
 
-    data = config_entry.data.copy()
-
+    data = {**config_entry.data}
     current_version = data.get("version", 1)
 
-    if current_version != CONFIG_VERSION:
-        _LOGGER.info(
-            "Migrating entry %s to version %s", config_entry.entry_id, CONFIG_VERSION
-        )
-        new_options = {**config_entry.options}
+    if current_version >= CONFIG_VERSION:
+        return True
 
+    _LOGGER.info(
+        "Migrating entry %s from version %s to version %s",
+        config_entry.entry_id,
+        current_version,
+        CONFIG_VERSION,
+    )
+    new_options = {**config_entry.options}
+
+    # Migration 1 -> 2: absolute surcharge was stored in ct/kWh, convert to EUR/kWh
+    if current_version == 1:
         if (
             CONF_SURCHARGE_ABS in config_entry.options
             and config_entry.options[CONF_SURCHARGE_ABS] is not None
@@ -208,16 +219,32 @@ async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry) ->
             new_options[CONF_SURCHARGE_ABS] = (
                 config_entry.options[CONF_SURCHARGE_ABS] * 0.01
             )
+        current_version = 2
 
-        hass.config_entries.async_update_entry(
-            config_entry, options=new_options, version=CONFIG_VERSION
-        )
+    # Migration 2 -> 3: EPEX Spot Web Scraper source was removed; migrate to
+    # Energy-Charts.info which provides the same EPEX day-ahead price data.
+    if current_version == 2:
+        if data.get(CONF_SOURCE) == CONF_SOURCE_EPEX_SPOT_WEB:
+            data[CONF_SOURCE] = CONF_SOURCE_ENERGYCHARTS
+            _LOGGER.info(
+                "Migrated entry %s from legacy source '%s' to '%s'",
+                config_entry.entry_id,
+                CONF_SOURCE_EPEX_SPOT_WEB,
+                CONF_SOURCE_ENERGYCHARTS,
+            )
+        current_version = 3
 
-        _LOGGER.info(
-            "Migration of entry %s to version %s successful",
-            config_entry.entry_id,
-            CONFIG_VERSION,
-        )
+    data["version"] = CONFIG_VERSION
+
+    hass.config_entries.async_update_entry(
+        config_entry, data=data, options=new_options, version=CONFIG_VERSION
+    )
+
+    _LOGGER.info(
+        "Migration of entry %s to version %s successful",
+        config_entry.entry_id,
+        CONFIG_VERSION,
+    )
 
     return True
 

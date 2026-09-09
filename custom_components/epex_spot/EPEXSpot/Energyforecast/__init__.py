@@ -1,10 +1,10 @@
 """Energyforecast.de"""
 
-from datetime import datetime
 import logging
+from datetime import datetime
+from typing import ClassVar
 
 import aiohttp
-
 
 from ...const import UOM_EUR_PER_KWH
 
@@ -20,7 +20,7 @@ class Marketprice:
         self._market_price_per_kwh = round(float(data["price"]), 6)
 
     def __repr__(self):
-        return f"{self.__class__.__name__}(start: {self._start_time.isoformat()}, end: {self._end_time.isoformat()}, marketprice: {self._market_price_per_kwh} {UOM_EUR_PER_KWH})"  # noqa: E501
+        return f"{self.__class__.__name__}(start: {self._start_time.isoformat()}, end: {self._end_time.isoformat()}, marketprice: {self._market_price_per_kwh} {UOM_EUR_PER_KWH})"
 
     @property
     def start_time(self):
@@ -38,13 +38,16 @@ class Marketprice:
 class Energyforecast:
     URL = "https://www.energyforecast.de/api/v1/predictions/prices_for_ha"
 
-    MARKET_AREAS = {
-    "de": "DE-LU",
-    "be": "BE",
-    "nl": "NL",
-    "fr": "FR",
-    "at": "AT",
-}
+    MARKET_AREAS: ClassVar[dict[str, str]] = {
+        "de": "DE-LU",
+        "be": "BE",
+        "nl": "NL",
+        "fr": "FR",
+        "at": "AT",
+        "dk1": "DK1",
+        "dk2": "DK2",
+        "pl": "PL",
+    }
     SUPPORTED_DURATIONS = (15, 60)
 
     def __init__(

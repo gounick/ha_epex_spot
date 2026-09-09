@@ -13,13 +13,15 @@ ATTR_RANK = "rank"
 ATTR_QUANTILE = "quantile"
 ATTR_PRICE_PER_KWH = "price_per_kwh"
 
-CONFIG_VERSION = 2
+CONFIG_VERSION = 3
 CONF_SOURCE = "source"
 CONF_MARKET_AREA = "market_area"
 CONF_TOKEN = "token"
 
 # possible values for CONF_SOURCE
 CONF_SOURCE_AWATTAR = "Awattar"
+# Legacy source, removed; migrated to Energy-Charts.info
+CONF_SOURCE_EPEX_SPOT_WEB = "EPEX Spot Web Scraper"
 CONF_SOURCE_SMARD_DE = "SMARD.de"
 CONF_SOURCE_SMARTENERGY = "smartENERGY.at"
 CONF_SOURCE_TIBBER = "Tibber"
@@ -27,6 +29,7 @@ CONF_SOURCE_ENERGYFORECAST = "Energyforecast.de"
 CONF_SOURCE_ENTSOE = "ENTSO-E-Transparency"
 CONF_SOURCE_ENERGYCHARTS = "Energy-Charts.info"
 CONF_SOURCE_HOFER_GRUENSTROM = "Hofer Gruenstrom"
+CONF_SOURCE_ENERGYZERO = "EnergyZero"
 
 # configuration options for total price calculation
 CONF_SURCHARGE_PERC = "percentage_surcharge"

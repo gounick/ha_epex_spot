@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 
-import aiohttp
 import asyncio
 
+import aiohttp
+
+from .const import TIBBER_DEMO_TOKEN, UOM_EUR_PER_KWH
 from .EPEXSpot import Tibber
-from .const import UOM_EUR_PER_KWH, TIBBER_DEMO_TOKEN
 
 
 async def main():

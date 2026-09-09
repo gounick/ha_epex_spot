@@ -1,9 +1,9 @@
 """Energy-Charts API Client."""
 
-from datetime import date, datetime, timezone, timedelta
 import logging
+from datetime import UTC, datetime, timedelta
+
 import aiohttp
-from typing import List
 
 from ...common import Marketprice, average_marketdata
 
@@ -77,7 +77,7 @@ class EnergyCharts:
         self._session = session
         self._market_area = market_area
         self._duration = duration
-        self._marketdata: List[Marketprice] = []
+        self._marketdata: list[Marketprice] = []
 
     @property
     def name(self):
@@ -142,7 +142,7 @@ class EnergyCharts:
 
     async def _fetch_data(self):
         # Compute start = today, end = tomorrow (daily format)
-        start_date = date.today()
+        start_date = datetime.now(UTC).date()
         end_date = start_date + timedelta(days=1)
 
         params = {
@@ -160,11 +160,11 @@ class EnergyCharts:
     #
     def _extract_marketdata(
         self, unix_seconds, prices, duration, unit
-    ) -> List[Marketprice]:
-        entries: List[Marketprice] = []
+    ) -> list[Marketprice]:
+        entries: list[Marketprice] = []
 
         for ts, price_mwh in zip(unix_seconds, prices):
-            start_time = datetime.fromtimestamp(ts, tz=timezone.utc)
+            start_time = datetime.fromtimestamp(ts, tz=UTC)
             price_kwh = float(price_mwh) / 1000.0
 
             entries.append(

@@ -1,11 +1,10 @@
 """SourceShell"""
 
-from datetime import timedelta
 import logging
+from datetime import timedelta
 from typing import Any
 
 import aiohttp
-
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.util import dt
 
@@ -18,13 +17,14 @@ from custom_components.epex_spot.const import (
     CONF_MARKET_AREA,
     CONF_SOURCE,
     CONF_SOURCE_AWATTAR,
-    CONF_SOURCE_ENERGYFORECAST,
-    CONF_SOURCE_ENTSOE,
     CONF_SOURCE_ENERGYCHARTS,
+    CONF_SOURCE_ENERGYFORECAST,
+    CONF_SOURCE_ENERGYZERO,
+    CONF_SOURCE_ENTSOE,
+    CONF_SOURCE_HOFER_GRUENSTROM,
     CONF_SOURCE_SMARD_DE,
     CONF_SOURCE_SMARTENERGY,
     CONF_SOURCE_TIBBER,
-    CONF_SOURCE_HOFER_GRUENSTROM,
     CONF_SURCHARGE_ABS,
     CONF_SURCHARGE_PERC,
     CONF_TAX,
@@ -36,15 +36,17 @@ from custom_components.epex_spot.const import (
     EMPTY_EXTREME_PRICE_INTERVAL_RESP,
 )
 from custom_components.epex_spot.EPEXSpot import (
+    ENTSOE,
     SMARD,
     Awattar,
+    EnergyCharts,
     Energyforecast,
+    EnergyZero,
+    HoferGruenstrom,
     Tibber,
     smartENERGY,
-    ENTSOE,
-    EnergyCharts,
-    HoferGruenstrom,
 )
+
 from .extreme_price_interval import find_extreme_price_interval, get_start_times
 
 _LOGGER = logging.getLogger(__name__)
@@ -100,6 +102,12 @@ class SourceShell:
             )
         elif config_entry.data[CONF_SOURCE] == CONF_SOURCE_ENERGYCHARTS:
             self._source = EnergyCharts.EnergyCharts(
+                market_area=config_entry.data[CONF_MARKET_AREA],
+                duration=config_entry.options.get(CONF_DURATION, DEFAULT_DURATION),
+                session=session,
+            )
+        elif config_entry.data[CONF_SOURCE] == CONF_SOURCE_ENERGYZERO:
+            self._source = EnergyZero.EnergyZero(
                 market_area=config_entry.data[CONF_MARKET_AREA],
                 duration=config_entry.options.get(CONF_DURATION, DEFAULT_DURATION),
                 session=session,

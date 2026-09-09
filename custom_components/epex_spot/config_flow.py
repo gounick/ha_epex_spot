@@ -4,27 +4,26 @@ Used by UI to setup integration.
 """
 
 import voluptuous as vol
-from typing import List, Tuple
-
 from homeassistant.config_entries import ConfigEntry, ConfigFlow, OptionsFlowWithReload
 from homeassistant.core import callback
 
 from .const import (
+    CONF_DURATION,
     CONF_MARKET_AREA,
     CONF_SOURCE,
     CONF_SOURCE_AWATTAR,
+    CONF_SOURCE_ENERGYCHARTS,
+    CONF_SOURCE_ENERGYFORECAST,
+    CONF_SOURCE_ENERGYZERO,
     CONF_SOURCE_ENTSOE,
+    CONF_SOURCE_HOFER_GRUENSTROM,
     CONF_SOURCE_SMARD_DE,
     CONF_SOURCE_SMARTENERGY,
     CONF_SOURCE_TIBBER,
-    CONF_SOURCE_ENERGYFORECAST,
-    CONF_SOURCE_ENERGYCHARTS,
-    CONF_SOURCE_HOFER_GRUENSTROM,
     CONF_SURCHARGE_ABS,
     CONF_SURCHARGE_PERC,
     CONF_TAX,
     CONF_TOKEN,
-    CONF_DURATION,
     CONFIG_VERSION,
     DEFAULT_DURATION,
     DEFAULT_SURCHARGE_ABS,
@@ -33,14 +32,15 @@ from .const import (
     DOMAIN,
 )
 from .EPEXSpot import (
+    ENTSOE,
     SMARD,
     Awattar,
+    EnergyCharts,
+    Energyforecast,
+    EnergyZero,
+    HoferGruenstrom,
     Tibber,
     smartENERGY,
-    Energyforecast,
-    ENTSOE,
-    EnergyCharts,
-    HoferGruenstrom,
 )
 
 CONF_SOURCE_LIST = (
@@ -51,6 +51,7 @@ CONF_SOURCE_LIST = (
     CONF_SOURCE_TIBBER,
     CONF_SOURCE_ENERGYFORECAST,
     CONF_SOURCE_ENERGYCHARTS,
+    CONF_SOURCE_ENERGYZERO,
     CONF_SOURCE_HOFER_GRUENSTROM,
 )
 
@@ -94,7 +95,9 @@ class EpexSpotConfigFlow(ConfigFlow, domain=DOMAIN):  # type: ignore
             vol.Schema(
                 {
                     vol.Required(CONF_MARKET_AREA): vol.In(areas),
-                    vol.Required(CONF_DURATION): vol.All(vol.Coerce(int), vol.In(durations)),
+                    vol.Required(CONF_DURATION): vol.All(
+                        vol.Coerce(int), vol.In(durations)
+                    ),
                     vol.Required(CONF_TOKEN): vol.Coerce(str),
                 }
             )
@@ -102,7 +105,9 @@ class EpexSpotConfigFlow(ConfigFlow, domain=DOMAIN):  # type: ignore
             else vol.Schema(
                 {
                     vol.Required(CONF_MARKET_AREA): vol.In(areas),
-                    vol.Required(CONF_DURATION): vol.All(vol.Coerce(int), vol.In(durations)),
+                    vol.Required(CONF_DURATION): vol.All(
+                        vol.Coerce(int), vol.In(durations)
+                    ),
                 },
             )
         )
@@ -110,7 +115,9 @@ class EpexSpotConfigFlow(ConfigFlow, domain=DOMAIN):  # type: ignore
         # Add warning for HoferGruenstrom about disabled SSL
         description_placeholders = {"ssl_warning": ""}
         if self._source_name == CONF_SOURCE_HOFER_GRUENSTROM:
-            description_placeholders["ssl_warning"] = "Warning: SSL certificate verification is disabled for this source."
+            description_placeholders["ssl_warning"] = (
+                "Warning: SSL certificate verification is disabled for this source."
+            )
 
         return self.async_show_form(
             step_id="market_area",
@@ -191,7 +198,7 @@ class EpexSpotOptionsFlow(OptionsFlowWithReload):
                         default=self.config_entry.options.get(
                             CONF_DURATION, DEFAULT_DURATION
                         ),
-                    ): vol.In(durations),
+                    ): vol.All(vol.Coerce(int), vol.In(durations)),
                 }
             ),
         )
@@ -199,7 +206,7 @@ class EpexSpotOptionsFlow(OptionsFlowWithReload):
 
 def getParametersForSource(
     source_name: str,
-) -> Tuple[List[str], List[int], bool]:
+) -> tuple[list[str], list[int], bool]:
     """
     returns sorted market areas, durations and if given source requires a token
     """
@@ -250,6 +257,12 @@ def getParametersForSource(
         return (
             HoferGruenstrom.HoferGruenstrom.MARKET_AREAS,
             HoferGruenstrom.HoferGruenstrom.SUPPORTED_DURATIONS,
+            False,
+        )
+    if source_name == CONF_SOURCE_ENERGYZERO:
+        return (
+            EnergyZero.EnergyZero.MARKET_AREAS,
+            EnergyZero.EnergyZero.SUPPORTED_DURATIONS,
             False,
         )
 

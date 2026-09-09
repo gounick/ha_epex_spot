@@ -1,5 +1,4 @@
 from datetime import datetime, timedelta
-from typing import List
 
 from .const import UOM_EUR_PER_KWH
 
@@ -20,7 +19,7 @@ class Marketprice:
         self._unit = unit
 
     def __repr__(self):
-        return f"{self.__class__.__name__}(start: {self._start_time.isoformat()}, end: {self._end_time.isoformat()}, marketprice: {self._market_price_per_kwh} {self._unit})"  # noqa: E501
+        return f"{self.__class__.__name__}(start: {self._start_time.isoformat()}, end: {self._end_time.isoformat()}, marketprice: {self._market_price_per_kwh} {self._unit})"
 
     @property
     def start_time(self):
@@ -38,8 +37,8 @@ class Marketprice:
         return self._market_price_per_kwh
 
 
-def compress_marketdata(data: List[Marketprice], duration: int) -> List[Marketprice]:
-    entries: List[Marketprice] = []
+def compress_marketdata(data: list[Marketprice], duration: int) -> list[Marketprice]:
+    entries: list[Marketprice] = []
     start: Marketprice = None
     for entry in data:
         if start is None:
@@ -61,8 +60,8 @@ def compress_marketdata(data: List[Marketprice], duration: int) -> List[Marketpr
 
 
 def average_marketdata(
-    data: List[Marketprice], target_duration: int
-) -> List[Marketprice]:
+    data: list[Marketprice], target_duration: int
+) -> list[Marketprice]:
     if not data:
         return []
 
@@ -70,7 +69,7 @@ def average_marketdata(
 
     group_size = target_duration // entry_duration
 
-    result: List[Marketprice] = []
+    result: list[Marketprice] = []
 
     for i in range(0, len(data), group_size):
         group = data[i : i + group_size]

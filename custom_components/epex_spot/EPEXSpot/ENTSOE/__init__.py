@@ -1,12 +1,11 @@
 """ENTSO-E Transparency API Client."""
 
-from datetime import datetime, timedelta, timezone
 import enum
-from gettext import find
 import logging
-import aiohttp
 import xml.etree.ElementTree as ET
-from typing import List
+from datetime import UTC, datetime, timedelta
+
+import aiohttp
 
 # Replace this import with your actual Marketprice & compress_marketdata implementations
 from ...common import Marketprice, average_marketdata
@@ -89,7 +88,7 @@ class EntsoeTransparency:
         self._market_area = market_area
         self._duration = duration
         self._token = token
-        self._marketdata: List[Marketprice] = []
+        self._marketdata: list[Marketprice] = []
 
     @property
     def name(self):
@@ -120,12 +119,12 @@ class EntsoeTransparency:
 
         # Compress if needed
         if self._duration != 15:
-            logging.debug("Averaging market data... from 15 to", self._duration)
+            _LOGGER.debug("Averaging market data... from 15 to %s", self._duration)
             self._marketdata = average_marketdata(self._marketdata, self._duration)
 
-    async def _fetch_day_ahead(self) -> List[Marketprice]:
+    async def _fetch_day_ahead(self) -> list[Marketprice]:
         """Fetch day-ahead electricity prices (A44)."""
-        now = datetime.now(timezone.utc)  # Align to full hour
+        now = datetime.now(UTC)  # Align to full hour
         start_dt = now.replace(minute=0, second=0, microsecond=0)
         end_dt = start_dt + timedelta(days=2)  # next 2 days
         params = {
@@ -149,9 +148,9 @@ class EntsoeTransparency:
             resp.raise_for_status()
             return await resp.text()
 
-    def _extract_marketdata(self, xml_text) -> List[Marketprice]:
+    def _extract_marketdata(self, xml_text) -> list[Marketprice]:
         """Extract prices (€/MWh → €/kWh) from XML, filling missing positions."""
-        entries: List[Marketprice] = []
+        entries: list[Marketprice] = []
         root = ET.fromstring(xml_text)
         ns = {"ns": "urn:iec62325.351:tc57wg16:451-3:publicationdocument:7:3"}
 
@@ -185,7 +184,7 @@ class EntsoeTransparency:
                 time_interval = period.find("ns:timeInterval", ns)
                 start_str = time_interval.find("ns:start", ns).text
                 start_dt = datetime.strptime(start_str, "%Y-%m-%dT%H:%MZ").replace(
-                    tzinfo=timezone.utc
+                    tzinfo=UTC
                 )
 
                 resolution = period.find("ns:resolution", ns).text
@@ -201,8 +200,10 @@ class EntsoeTransparency:
 
                     if prev_position is not None and position > prev_position + 1:
                         for missing_pos in range(prev_position + 1, position):
-                            logging.debug(
-                                f"Filling missing position {missing_pos} using previous price {prev_price_kwh} €/kWh"
+                            _LOGGER.debug(
+                                "Filling missing position %s using previous price %s €/kWh",
+                                missing_pos,
+                                prev_price_kwh,
                             )
                             entries.append(
                                 Marketprice(

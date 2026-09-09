@@ -21,7 +21,7 @@ You can choose between multiple sources:
    [Awattar](https://www.awattar.de/services/api) provides a free of charge service for their customers. Market price data is available for Germany and Austria. So far no user identifiation is required.
 
 2. Energyforecast.de
-   [Energyforecast.de](https://www.energyforecast.de/api-docs/index.html) provides services to get market price data forecasts for Germany up to 96 hours into the future. An API token is required.
+   [Energyforecast.de](https://www.energyforecast.de/api-docs/index.html) provides services to get market price data forecasts for multiple market areas (AT, BE, DE-LU, DK1, DK2, FR, NL, PL) up to 96 hours into the future. An API token is required.
 
 3. SMARD.de
    [SMARD.de](https://www.smard.de) provides a free of charge API to retrieve a lot of information about electricity market including market prices. SMARD.de is serviced by the Bundesnetzagentur, Germany.
@@ -39,7 +39,10 @@ You can choose between multiple sources:
    [Energy-Charts](https://energy-charts.info) provides a publicly accessible API offering real-time electricity market prices for many European bidding zones.
    No registration or API token is required.
 
-8. Hofer Grünstrom
+8. EnergyZero
+   [EnergyZero](https://www.energyzero.nl) provides dynamic electricity prices for the Netherlands. The public REST API supports both hourly and quarter-hourly intervals and does not require authentication.
+
+9. Hofer Grünstrom
    [Hofer Grünstrom](https://www.hofer-grünstrom.at/tarife-zum-geld-sparen#spot) has an open API for accessing market data for Austria. So far no user identification is required. (This API is not officially documented, but was discovered by reverse engineering the Hofer Grünstrom website.)
 
    ⚠️ **Note:** The SSL certificate used by the Hofer Grünstrom API is not trusted publicly. Therefore, when using this source, the integration will ignore SSL certificate verification. This is a potential security risk, so please be aware of this when using this source.
@@ -125,6 +128,7 @@ Total Price = ((Market Price * 1.03) + 0.012) * 1.19
 > smartENERGY.at
 > As of Feb 2024, even though smartENERGY says that the prices reported by the API already include 20% tax (meaning users would configure the sensor to add a static €0.0144 to every price value from the API), [this is incorrect, and the API reports pricing without Tax](https://github.com/mampfes/ha_epex_spot/issues/108#issuecomment-1951423366 "this is incorrect, and the API reports pricing without Tax").
 > To get the actual, current total price [listed by smartENERGY on their website](https://www.smartenergy.at/smartcontrol#:~:text=Aktueller%20Stundenpreis "listed by smartENERGY on their website"), configure:
+>
 > - Absolute surcharge = €0.012
 > - Tax = 20%
 

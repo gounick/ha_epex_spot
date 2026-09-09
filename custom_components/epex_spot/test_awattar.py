@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 
-import aiohttp
-
 import asyncio
 
-from .EPEXSpot import Awattar
+import aiohttp
+
 from .const import UOM_EUR_PER_KWH
+from .EPEXSpot import Awattar
 
 
 async def main():

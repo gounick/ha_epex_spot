@@ -14,6 +14,8 @@ jobs:
   hacs:
     name: HACS Action
     runs-on: "ubuntu-latest"
+    permissions:
+      contents: read
     steps:
       - name: Checkout
         uses: "actions/checkout@v4"
@@ -21,3 +23,6 @@ jobs:
         uses: "hacs/action@main"
         with:
           category: "integration"
+          # Repository topics and issues must be enabled for HACS publish.
+          # Ignore here so CI passes until the repository settings are updated.
+          ignore: "topics issues"

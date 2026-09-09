@@ -67,18 +67,33 @@ def average_marketdata(
 
     entry_duration = int((data[0]._end_time - data[0]._start_time).total_seconds() / 60)
 
-    group_size = target_duration // entry_duration
+    if entry_duration == target_duration:
+        return data
 
     result: list[Marketprice] = []
 
-    for i in range(0, len(data), group_size):
-        group = data[i : i + group_size]
-
-        avg_price = round(sum(e._market_price_per_kwh for e in group) / len(group), 5)
-        start = group[0]._start_time
-
-        result.append(
-            Marketprice(start_time=start, duration=target_duration, price=avg_price)
-        )
+    if target_duration > entry_duration:
+        group_size = target_duration // entry_duration
+        for i in range(0, len(data), group_size):
+            group = data[i : i + group_size]
+            avg_price = round(
+                sum(e._market_price_per_kwh for e in group) / len(group), 5
+            )
+            start = group[0]._start_time
+            result.append(
+                Marketprice(start_time=start, duration=target_duration, price=avg_price)
+            )
+    else:
+        split_count = entry_duration // target_duration
+        for entry in data:
+            for i in range(split_count):
+                start = entry._start_time + timedelta(minutes=target_duration * i)
+                result.append(
+                    Marketprice(
+                        start_time=start,
+                        duration=target_duration,
+                        price=entry._market_price_per_kwh,
+                    )
+                )
 
     return result

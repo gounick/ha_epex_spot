@@ -12,6 +12,7 @@ repos:
       - id: black
         args:
           - --quiet
+          - --target-version=py314
         files: ^((custom_components|pylint|script|tests)/.+)?[^/]+\.py$
   - repo: https://github.com/codespell-project/codespell
     rev: v2.4.3
@@ -53,7 +54,7 @@ repos:
       - id: python-typing-update
         stages: [manual]
         args:
-          - --py311-plus
+          - --py314-plus
           - --force
           - --keep-updates
         files: ^(custom_components|tests|script)/.+\.py$

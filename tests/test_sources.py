@@ -81,5 +81,5 @@ async def test_source_fetch(spec: _SourceSpec, market_area: str, duration: int) 
                     f"returned 404 for {err.request_info.url}"
                 )
             pytest.skip(f"HTTP {err.status} from {err.request_info.url}")
-        except (TimeoutError, aiohttp.ClientError):
+        except TimeoutError, aiohttp.ClientError:
             pytest.skip("Network or API temporarily unavailable")

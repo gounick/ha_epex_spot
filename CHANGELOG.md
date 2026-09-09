@@ -26,6 +26,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `AGENTS.md` instructions for `uv`/`uvx` development environment.
 - Updated `LICENSE` with fork copyright.
 - GitHub Actions release workflows that update `CHANGELOG.md` and `manifest.json` on release (manual or automatic).
+- Security scanning workflows with Gitleaks and Kingfisher.
+- Kingfisher pre-commit hook.
+- Renovate configuration.
 
 ### Changed
 

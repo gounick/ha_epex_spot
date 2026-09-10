@@ -1,6 +1,12 @@
 # EPEX Spot
 
-[![hacs_badge](https://img.shields.io/badge/HACS-Default-orange.svg)](https://github.com/custom-components/hacs)
+[![hassfest](https://github.com/gounick/ha_epex_spot/actions/workflows/hassfest.yaml/badge.svg?branch=main)](https://github.com/gounick/ha_epex_spot/actions/workflows/hassfest.yaml)
+[![HACS](https://github.com/gounick/ha_epex_spot/actions/workflows/hacs.yaml/badge.svg?branch=main)](https://github.com/gounick/ha_epex_spot/actions/workflows/hacs.yaml)
+[![Tests](https://github.com/gounick/ha_epex_spot/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/gounick/ha_epex_spot/actions/workflows/tests.yml)
+[![Security](https://github.com/gounick/ha_epex_spot/actions/workflows/security.yml/badge.svg?branch=main)](https://github.com/gounick/ha_epex_spot/actions/workflows/security.yml)
+[![Release checks](https://github.com/gounick/ha_epex_spot/actions/workflows/release.yml/badge.svg?branch=main)](https://github.com/gounick/ha_epex_spot/actions/workflows/release.yml)
+[![hacs_badge](https://img.shields.io/badge/HACS-Default-orange.svg)](https://github.com/hacs/integration)
+![Version](https://img.shields.io/github/v/release/gounick/ha_epex_spot?style=plastic)
 
 This component adds electricity prices from stock exchange [EPEX Spot](https://www.epexspot.com) to Home Assistant. [EPEX Spot](https://www.epexspot.com) does not provide free access to the data, so this component uses different ways to retrieve the data.
 
@@ -11,7 +17,7 @@ This component adds electricity prices from stock exchange [EPEX Spot](https://w
 
 There is a companion integration which simplifies the use of EPEX Spot integration to switch on/off an application depending on the energy market prices:
 
-<https://github.com/mampfes/ha_epex_spot_sensor>
+<https://github.com/gounick/ha_epex_spot_sensor>
 
 ---
 
@@ -126,7 +132,7 @@ Total Price = ((Market Price * 1.03) + 0.012) * 1.19
 
 > [!NOTE]
 > smartENERGY.at
-> As of Feb 2024, even though smartENERGY says that the prices reported by the API already include 20% tax (meaning users would configure the sensor to add a static €0.0144 to every price value from the API), [this is incorrect, and the API reports pricing without Tax](https://github.com/mampfes/ha_epex_spot/issues/108#issuecomment-1951423366 "this is incorrect, and the API reports pricing without Tax").
+> As of Feb 2024, even though smartENERGY says that the prices reported by the API already include 20% tax (meaning users would configure the sensor to add a static €0.0144 to every price value from the API), [this is incorrect, and the API reports pricing without Tax](https://github.com/gounick/ha_epex_spot/issues/108#issuecomment-1951423366 "this is incorrect, and the API reports pricing without Tax").
 > To get the actual, current total price [listed by smartENERGY on their website](https://www.smartenergy.at/smartcontrol#:~:text=Aktueller%20Stundenpreis "listed by smartENERGY on their website"), configure:
 >
 > - Absolute surcharge = €0.012
@@ -356,7 +362,7 @@ epex_spot.fetch_data
 
 ### 3. The EPEX Spot Sensor Integration
 
-A significantly easier, GUI-based method to achieve some of the results listed above is to install the [EPEX Spot Sensor](https://github.com/mampfes/ha_epex_spot_sensor "EPEX Spot Sensor") integration (via HACS) and configure helpers with it. An example for this method is covered in FAQ 2 below.
+A significantly easier, GUI-based method to achieve some of the results listed above is to install the [EPEX Spot Sensor](https://github.com/gounick/ha_epex_spot_sensor "EPEX Spot Sensor") integration (via HACS) and configure helpers with it. An example for this method is covered in FAQ 2 below.
 
 ## FAQ
 
@@ -390,7 +396,7 @@ series:
       });
 ```
 
-See [this Show & Tell post](https://github.com/mampfes/ha_epex_spot/discussions/110) for a fancier, more elaborate version of this card that can auto-hide the next day's prices when they aren't available, colour the hourly bars depending on the price, etc.
+See [this Show & Tell post](https://github.com/gounick/ha_epex_spot/discussions/110) for a fancier, more elaborate version of this card that can auto-hide the next day's prices when they aren't available, colour the hourly bars depending on the price, etc.
 
 **Assumptions:**
 
@@ -402,7 +408,7 @@ If you are using a different source, you will need to first update `sensor.epex_
 
 ### 2. How can I optimise the best moment to start appliances?
 
-It might be an interesting use case to know what the hours with lowest consecutive prices during the day are. This might be of value when looking for the most optimum time to start your washing machine, dishwasher, dryer, etc. The most convenient way to do this would be to install and configure the [EPEX Spot Sensor](https://github.com/mampfes/ha_epex_spot_sensor "EPEX Spot Sensor") (via HACS).
+It might be an interesting use case to know what the hours with lowest consecutive prices during the day are. This might be of value when looking for the most optimum time to start your washing machine, dishwasher, dryer, etc. The most convenient way to do this would be to install and configure the [EPEX Spot Sensor](https://github.com/gounick/ha_epex_spot_sensor "EPEX Spot Sensor") (via HACS).
 
 #### Example 1: Manually starting / scheduling a "dumb" dishwasher\*\*
 
@@ -474,7 +480,7 @@ Finally, create Entity Cards on your dashboard with the sensors you want to disp
 
 ![Dishwasher Card Examples](/images/dishwasher-card-examples.png)
 
-See [this Show & Tell post](https://github.com/mampfes/ha_epex_spot/discussions/111) for a fancier, more elaborate version of this card that can show several appliances at once, auto hide ones that don't have data, and even hide itself when there is no data at all.
+See [this Show & Tell post](https://github.com/gounick/ha_epex_spot/discussions/111) for a fancier, more elaborate version of this card that can show several appliances at once, auto hide ones that don't have data, and even hide itself when there is no data at all.
 
 #### Example 2: Automating a Home-Assitant-Connected Washer/Dryer
 
@@ -532,7 +538,7 @@ actions:
       entity_id: button.aeg_washer_dryer_executecommand_resume
 ```
 
-See [this Show & Tell post](https://github.com/mampfes/ha_epex_spot/discussions/206) for a fancier, more elaborate version of this automation that has logging, notifications, manual overrides, etc.
+See [this Show & Tell post](https://github.com/gounick/ha_epex_spot/discussions/206) for a fancier, more elaborate version of this automation that has logging, notifications, manual overrides, etc.
 
 ### 3. I want to combine and view everything
 

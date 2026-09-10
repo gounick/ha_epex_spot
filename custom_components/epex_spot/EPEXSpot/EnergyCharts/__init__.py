@@ -16,7 +16,6 @@ BIDDING_ZONES = {
     "CH",
     "CZ",
     "DE-LU",
-    "DE-AT-LU",
     "DK1",
     "DK2",
     "EE",

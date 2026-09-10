@@ -29,6 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Options flow now coerces the duration value to `int`, matching the initial config flow and fixing the dropdown display.
 - Config-entry migration now persists `data["version"]` and migrates the removed `EPEX Spot Web Scraper` source to `Energy-Charts.info`.
 - Removed unsupported market areas from SMARD.de mapping (only `DE-LU` and `AT` are currently provided by SMARD, others caused HTTP 404).
+- Removed `DE-AT-LU` from Energy-Charts bidding zones (API returns 404 for this zone).
 
 ### Changed
 

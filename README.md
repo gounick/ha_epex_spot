@@ -47,7 +47,7 @@ You can choose between multiple sources:
 
    ⚠️ **Note:** The SSL certificate used by the Hofer Grünstrom API is not trusted publicly. Therefore, when using this source, the integration will ignore SSL certificate verification. This is a potential security risk, so please be aware of this when using this source.
 
-If you like this component, please give it a star on [github](https://github.com/mampfes/hacs_epex_spot).
+If you like this component, please give it a star on [github](https://github.com/gounick/ha_epex_spot).
 
 ## Installation
 
@@ -55,7 +55,7 @@ If you like this component, please give it a star on [github](https://github.com
 
 2. Install **EPEX Spot** integration via HACS:
 
-   [![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=mampfes&repository=ha_epex_spot)
+   [![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=gounick&repository=ha_epex_spot)
 
 3. Add **EPEX Spot** integration to Home Assistant:
 
